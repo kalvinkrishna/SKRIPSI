@@ -1,0 +1,103 @@
+clc;    % Clear the command window.
+close all;  % Close all figures (except those of imtool.)
+clear;  % Erase all existing variables. Or clearvars if you want.
+workspace;  % Make sure the workspace panel is showing.
+format long g;
+format compact;
+fontSize = 20;
+tic;
+%fullFileName = fullfile(pwd, 'crop.png');
+
+grayImage = imread('ASU.png');
+% Get the dimensions of the image.
+% numberOfColorBands should be = 1.
+[rows, columns, numberOfColorBands] = size(grayImage);
+if numberOfColorBands > 1
+	% It's not really gray scale like we expected - it's color.
+	% Convert it to gray scale by taking only the green channel.
+	grayImage = grayImage(:, :, 2); % Take green channel.
+end
+% Display the original gray scale image.
+subplot(2, 3, 1);
+imshow(grayImage, []);
+title('Original Grayscale Image', 'FontSize', fontSize, 'Interpreter', 'None');
+axis on;
+
+% Set up figure properties:
+% Enlarge figure to full screen.
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
+% Get rid of tool bar and pulldown menus that are along top of figure.
+set(gcf, 'Toolbar', 'none', 'Menu', 'none');
+% Give a name to the title bar.
+set(gcf, 'Name', 'Line segmentation', 'NumberTitle', 'Off')
+
+subplot(2, 3, 2);
+histogram(grayImage);
+uiwait(helpdlg('This is the histogram'));
+binaryImage = grayImage < 100;
+imshow(binaryImage);
+title('Binary Image', 'FontSize', fontSize, 'Interpreter', 'None');
+axis on;
+
+% _summing the image horizontally_
+verticalProfile = sum(binaryImage, 2);
+
+subplot(2, 3, 3);
+plot(verticalProfile, 'b-');
+grid on;
+title('Vertical Profile', 'FontSize', fontSize, 'Interpreter', 'None');
+
+% _create logical vector of what lines have text and which do not based on
+%threshold_
+rowsWithText = verticalProfile> 10;
+
+% _finding top and bottom lins_
+topLines = find(diff(rowsWithText) == 1);
+bottomLines = find(diff(rowsWithText) == -1);
+jumlah = length(topLines);
+% _looping for extracting characters in the image_
+for k = 1 : jumlah  % _loop for segmenting horizontal lines_
+	topRow = topLines(k)-3;
+	bottomRow = bottomLines(k)+3;
+	thisLine = binaryImage(topRow:bottomRow, :);
+    
+	subplot(2, 3, 4);
+	imshow(thisLine, []);
+	%imsave();
+	file_name=sprintf('line_%d.png',k);  % assuming you are saving image as a .jpg
+	imwrite(thisLine, file_name);
+	
+	axis on;
+	caption = sprintf('Line %d of the text', k);
+	title(caption, 'FontSize', fontSize, 'Interpreter', 'None');
+	
+	% _summing the segmented image vertically_
+	horizontalProfile = sum(thisLine, 1);
+	subplot(2, 3, 5);
+	plot(horizontalProfile, 'b-');
+	grid on;
+	caption = sprintf('Horizontal Profile of Line %d of the text', k);
+	title(caption, 'FontSize', fontSize, 'Interpreter', 'None');
+	
+	theThreshold = 0.1 * abs(topRow-bottomRow);
+	columnWithText = horizontalProfile > theThreshold;
+	leftCharacter = find(diff(columnWithText) == 1);
+	rightCharacter = find(diff(columnWithText) == -1);
+	
+    for j=1 : length(leftCharacter)
+        leftpoint = leftCharacter(j);
+        rightpoint = rightCharacter(j);
+        thisCharacter = binaryImage(topRow:bottomRow,leftpoint:rightpoint);
+         subplot(2, 3, 6);
+        imshow(thisCharacter,[]);
+        
+        promptMessage = sprintf('This is the image between rows %d and %d, inclusive.\nDo you want to find letters within this line,\nor Cancel to abort processing?', topRow, bottomRow);
+        titleBarCaption = 'Continue?';
+        button = questdlg(promptMessage, titleBarCaption, 'Continue', 'Cancel', 'Continue');
+        if strcmpi(button, 'Cancel')
+            return;
+        end
+       
+    end
+	
+end

@@ -1,0 +1,4 @@
+Kelemahan Histogram
+
+- Huruf LV Jenis Huruf Calibri
+- Font Huruf <12

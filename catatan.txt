@@ -1,0 +1,4 @@
+CHRVSTWAN =Christian
+FE = FB
+EVTIEN = EMAIL
+Mubile = mobile	

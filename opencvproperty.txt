@@ -1,0 +1,5 @@
+opencv region property
+
+'BoundingBox', 'Eccentricity', ...
+    'Solidity', 'Extent', 'Euler', 'Image'
+

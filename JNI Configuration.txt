@@ -1,0 +1,1 @@
+javah -o JNILIB/JNILIB.h -classpath JNI/build/classes/ jni.JNI

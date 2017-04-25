@@ -1,0 +1,13 @@
+RegionAreaRage
+min max
+3   600
+MaxAreaVariation
+60
+Result : 70%
+============================
+RegionAreaRage
+min max
+3   600
+MaxAreaVariation
+60
+Result : 70%

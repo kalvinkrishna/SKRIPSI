@@ -1,0 +1,2 @@
+textbbox di sorting berdasarkan nilai Xnya 
+kemudian lakukan algoritma untuk OCR
